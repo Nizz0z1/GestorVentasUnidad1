@@ -42,7 +42,7 @@ Para ejecutar este proyecto es necesario tener instalado:
 Para descargar el proyecto desde GitHub, ejecutar:
 
 ```bash
-git clone URL_DE_TU_REPOSITORIO
+git clone https://github.com/Nizz0z1/GestorVentasUnidad1.git
 ```
 Despues, en el programa, pondras:
 
