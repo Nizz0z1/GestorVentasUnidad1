@@ -39,18 +39,18 @@ Para ejecutar este proyecto es necesario tener instalado:
 
 ## Clonar el repositorio
 
-Para descargar el proyecto desde GitHub, ejecutar:
+Para descargar el proyecto desde GitHub, debes de abrir la terminal en vs y ejecutar:
 
 ```bash
 git clone https://github.com/Nizz0z1/GestorVentasUnidad1.git
 ```
-Despues, en el programa, pondras:
+Despues, en la terminal, vas a elegir el programa:
 
 ```bash
 cd GestorVentasUnidad1
 ```
 
-Y lo ejecutas:
+Y por ulitmo lo ejecutas con este codigo:
 
 ```bash
 dotnet run
