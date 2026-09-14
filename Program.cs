@@ -1,10 +1,5 @@
-﻿using System.Globalization;
-
-class Program
+﻿class Program
 {
-    // Formato de moneda
-    static readonly CultureInfo CulturaMoneda = new CultureInfo("es-CO");
-
     static void Main(string[] args)
     {
         List<string> nombres = new List<string>();
@@ -20,6 +15,7 @@ class Program
         do
         {
             ImprimirEncabezado("SISTEMA GESTOR DE VENTAS E INVENTARIO");
+
             Console.WriteLine("1. Registrar nuevo producto en inventario");
             Console.WriteLine("2. Consultar inventario completo");
             Console.WriteLine("3. Registrar una venta");
@@ -32,11 +28,20 @@ class Program
             switch (opcion)
             {
                 case 1:
-                    RegistrarProducto(nombres, precios, stocks, unidadesVendidasPorProducto);
+                    RegistrarProducto(
+                        nombres,
+                        precios,
+                        stocks,
+                        unidadesVendidasPorProducto
+                    );
                     break;
 
                 case 2:
-                    ConsultarInventario(nombres, precios, stocks);
+                    ConsultarInventario(
+                        nombres,
+                        precios,
+                        stocks
+                    );
                     break;
 
                 case 3:
@@ -75,6 +80,7 @@ class Program
         } while (opcion != 5);
     }
 
+
     // Lee números enteros
     static int LeerEntero(string mensaje, int min, int max)
     {
@@ -101,6 +107,7 @@ class Program
         }
     }
 
+
     // Lee números decimales
     static decimal LeerDecimal(string mensaje, decimal min)
     {
@@ -111,11 +118,7 @@ class Program
             Console.Write(mensaje);
             string entrada = Console.ReadLine();
 
-            if (!decimal.TryParse(
-                entrada,
-                NumberStyles.Any,
-                CultureInfo.InvariantCulture,
-                out valor))
+            if (!decimal.TryParse(entrada, out valor))
             {
                 Console.WriteLine("[ERROR] Entrada no válida. Debe ingresar un número decimal.");
                 continue;
@@ -131,6 +134,7 @@ class Program
         }
     }
 
+
     // Calcula el total de la factura
     static decimal CalcularFactura(
         decimal precio,
@@ -141,15 +145,24 @@ class Program
     {
         decimal subtotal = precio * cantidad;
 
-        montoDescuento = tieneDescuento ? subtotal * 0.10m : 0m;
+        if (tieneDescuento)
+        {
+            montoDescuento = subtotal * 0.10m;
+        }
+        else
+        {
+            montoDescuento = 0m;
+        }
 
         decimal baseGravable = subtotal - montoDescuento;
+
         montoIva = baseGravable * 0.19m;
 
         decimal totalAPagar = baseGravable + montoIva;
 
         return totalAPagar;
     }
+
 
     // Muestra un encabezado
     static void ImprimirEncabezado(string titulo)
@@ -158,6 +171,7 @@ class Program
         Console.WriteLine(titulo.ToUpper());
         Console.WriteLine("====================================================");
     }
+
 
     // Registra un producto
     static void RegistrarProducto(
@@ -181,30 +195,15 @@ class Program
                 continue;
             }
 
-            bool tieneNumeros = false;
-            foreach (char c in nombre)
-            {
-                if (char.IsDigit(c))
-                {
-                    tieneNumeros = true;
-                    break;
-                }
-            }
-
-            if (tieneNumeros)
-            {
-                Console.WriteLine("[ERROR] El nombre no puede contener números.");
-                continue;
-            }
-
             bool yaExiste = false;
+
             foreach (string n in nombres)
             {
-                if (n.Trim().ToLower() == nombre.Trim().ToLower())
+                if (n.ToLower() == nombre.ToLower())
                 {
                     yaExiste = true;
                     break;
-                }   
+                }
             }
 
             if (yaExiste)
@@ -217,7 +216,12 @@ class Program
         }
 
         decimal precio = LeerDecimal("Precio unitario ($): ", 0.01m);
-        int stock = LeerEntero("Stock inicial (cantidad disponible): ", 0, int.MaxValue);
+
+        int stock = LeerEntero(
+            "Stock inicial (cantidad disponible): ",
+            0,
+            int.MaxValue
+        );
 
         nombres.Add(nombre.Trim());
         precios.Add(precio);
@@ -227,6 +231,7 @@ class Program
         Console.WriteLine();
         Console.WriteLine($"El Producto '{nombre}' fue registrado con éxito.");
     }
+
 
     // Muestra todos los productos
     static void ConsultarInventario(
@@ -244,13 +249,19 @@ class Program
 
         for (int i = 0; i < nombres.Count; i++)
         {
-            string alerta = stocks[i] < 5 ? " [ALERTA: BAJO STOCK]" : "";
+            string alerta = "";
+
+            if (stocks[i] < 5)
+            {
+                alerta = " [ALERTA: BAJO STOCK]";
+            }
 
             Console.WriteLine(
-                $"{i + 1}. {nombres[i],-25} | Precio: {precios[i].ToString("C", CulturaMoneda),12} | Stock: {stocks[i]}{alerta}"
+                $"{i + 1}. {nombres[i],-25} | Precio: {precios[i].ToString("C"),12} | Stock: {stocks[i]}{alerta}"
             );
         }
     }
+
 
     // Registra una venta
     static void RegistrarVenta(
@@ -271,10 +282,15 @@ class Program
 
         for (int i = 0; i < nombres.Count; i++)
         {
-            string alerta = stocks[i] < 5 ? " [ALERTA: BAJO STOCK]" : "";
+            string alerta = "";
+
+            if (stocks[i] < 5)
+            {
+                alerta = " [ALERTA: BAJO STOCK]";
+            }
 
             Console.WriteLine(
-                $"{i + 1}. {nombres[i],-25} | Precio: {precios[i].ToString("C", CulturaMoneda),12} | Stock: {stocks[i]}{alerta}"
+                $"{i + 1}. {nombres[i],-25} | Precio: {precios[i].ToString("C"),12} | Stock: {stocks[i]}{alerta}"
             );
         }
 
@@ -294,15 +310,9 @@ class Program
         {
             cantidad = LeerEntero(
                 "Ingrese la cantidad a comprar: ",
-                int.MinValue,
-                int.MaxValue
+                1,
+                stocks[indice]
             );
-
-            if (cantidad <= 0)
-            {
-                Console.WriteLine("[ERROR] La cantidad debe ser mayor a cero. Ingrese un número válido.");
-                continue;
-            }
 
             if (cantidad > stocks[indice])
             {
@@ -323,7 +333,9 @@ class Program
             string respuesta = Console.ReadLine();
 
             if (respuesta != null)
-                respuesta = respuesta.Trim().ToUpper();
+            {
+                respuesta = respuesta.ToUpper();
+            }
 
             if (respuesta == "S")
             {
@@ -362,21 +374,23 @@ class Program
         totalCaja += total;
 
         // Muestra el ticket
-        
+
         Console.WriteLine();
         ImprimirEncabezado("Ticket de venta");
 
         Console.WriteLine($" Producto:             {nombres[indice]} (x{cantidad})");
-        Console.WriteLine($" Subtotal:             {subtotal.ToString("C", CulturaMoneda)}");
-        Console.WriteLine($" Descuento (10%):     -{montoDescuento.ToString("C", CulturaMoneda)}");
-        Console.WriteLine($" IVA (19%):            +{montoIva.ToString("C", CulturaMoneda)}");
+        Console.WriteLine($" Subtotal:             {subtotal.ToString("C")}");
+        Console.WriteLine($" Descuento (10%):     -{montoDescuento.ToString("C")}");
+        Console.WriteLine($" IVA (19%):            +{montoIva.ToString("C")}");
         Console.WriteLine(" ---------------------------------------------------");
-        Console.WriteLine($" TOTAL A PAGAR:        {total.ToString("C", CulturaMoneda)}");
+        Console.WriteLine($" TOTAL A PAGAR:        {total.ToString("C")}");
         Console.WriteLine("====================================================");
+
         Console.WriteLine(
             $" Venta efectuada con éxito. Stock actualizado: {stocks[indice]} unidades."
         );
     }
+
 
     // Muestra el reporte
     static void MostrarReporte(
@@ -406,10 +420,11 @@ class Program
         }
 
         Console.WriteLine($"Total de ventas realizadas: {totalVentasRealizadas}");
-        Console.WriteLine($"Total acumulado en caja:    {totalCaja.ToString("C", CulturaMoneda)}");
-        Console.WriteLine($"Promedio por venta:         {promedio.ToString("C", CulturaMoneda)}");
+        Console.WriteLine($"Total acumulado en caja:    {totalCaja.ToString("C")}");
+        Console.WriteLine($"Promedio por venta:         {promedio.ToString("C")}");
 
-        if (unidadesVendidas.Count > 0 && unidadesVendidas[indiceMasVendido] > 0)
+        if (unidadesVendidas.Count > 0 &&
+            unidadesVendidas[indiceMasVendido] > 0)
         {
             Console.WriteLine(
                 $"Producto más vendido:       {nombres[indiceMasVendido]} ({unidadesVendidas[indiceMasVendido]} unidades)"
